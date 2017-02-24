@@ -2,7 +2,6 @@
 #include "curand.h"
 #include "cublas_v2.h"
 
-extern "C" {
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
@@ -33,7 +32,6 @@ extern "C" {
 #include "route_layer.h"
 #include "shortcut_layer.h"
 #include "blas.h"
-}
 
 void forward_network_gpu(network net)
 {

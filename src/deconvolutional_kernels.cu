@@ -2,7 +2,6 @@
 #include "curand.h"
 #include "cublas_v2.h"
 
-extern "C" {
 #include "convolutional_layer.h"
 #include "deconvolutional_layer.h"
 #include "batchnorm_layer.h"
@@ -12,7 +11,6 @@ extern "C" {
 #include "col2im.h"
 #include "utils.h"
 #include "cuda.h"
-}
 
 extern "C" void forward_deconvolutional_layer_gpu(layer l, network net)
 {
