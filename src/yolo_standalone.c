@@ -81,10 +81,10 @@ static int YOLO_init(YOLO *self, char *datacfg, char *cfgfile, char *weightfile,
   set_batch_network(&self->net, 1);
   l = self->net.layers[self->net.n - 1];
   srand(2222222);
-  self->boxes = calloc(l.w * l.h * l.n, sizeof(box));
-  self->probs = calloc(l.w * l.h * l.n, sizeof(float *));
+  self->boxes = (box *) calloc(l.w * l.h * l.n, sizeof(box));
+  self->probs = (float **) calloc(l.w * l.h * l.n, sizeof(float *));
   for (j = 0; j < l.w * l.h * l.n; j++)
-    self->probs[j] = calloc(l.classes, sizeof(float));
+    self->probs[j] = (float *) calloc(l.classes, sizeof(float));
   fprintf(stderr, "---done allocating memory!\n");
 
   return 0;
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
   }
 
   // Init yolo
-  YOLO *yolo = calloc(1, sizeof(YOLO));
+  YOLO *yolo = (YOLO *) calloc(1, sizeof(YOLO));
   YOLO_init(yolo, data_cfg, cfg_file, weight_file, labels_dir, csv_file);
 
   // Label images

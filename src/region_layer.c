@@ -12,7 +12,7 @@
 
 layer make_region_layer(int batch, int w, int h, int n, int classes, int coords)
 {
-    layer l = {0};
+    layer l = {};
     l.type = REGION;
 
     l.n = n;
@@ -25,14 +25,14 @@ layer make_region_layer(int batch, int w, int h, int n, int classes, int coords)
     l.out_c = l.c;
     l.classes = classes;
     l.coords = coords;
-    l.cost = calloc(1, sizeof(float));
-    l.biases = calloc(n*2, sizeof(float));
-    l.bias_updates = calloc(n*2, sizeof(float));
+    l.cost = (float *) calloc(1, sizeof(float));
+    l.biases = (float *) calloc(n*2, sizeof(float));
+    l.bias_updates = (float *) calloc(n*2, sizeof(float));
     l.outputs = h*w*n*(classes + coords + 1);
     l.inputs = l.outputs;
     l.truths = 30*(l.coords + 1);
-    l.delta = calloc(batch*l.outputs, sizeof(float));
-    l.output = calloc(batch*l.outputs, sizeof(float));
+    l.delta = (float *) calloc(batch*l.outputs, sizeof(float));
+    l.output = (float *) calloc(batch*l.outputs, sizeof(float));
     int i;
     for(i = 0; i < n*2; ++i){
         l.biases[i] = .5;
@@ -61,8 +61,8 @@ void resize_region_layer(layer *l, int w, int h)
     l->outputs = h*w*l->n*(l->classes + l->coords + 1);
     l->inputs = l->outputs;
 
-    l->output = realloc(l->output, l->batch*l->outputs*sizeof(float));
-    l->delta = realloc(l->delta, l->batch*l->outputs*sizeof(float));
+    l->output = (float *) realloc(l->output, l->batch*l->outputs*sizeof(float));
+    l->delta = (float *) realloc(l->delta, l->batch*l->outputs*sizeof(float));
 
 #ifdef GPU
     cuda_free(l->delta_gpu);
@@ -109,27 +109,27 @@ void delta_region_mask(float *truth, float *x, int n, int index, float *delta, i
 }
 
 
-void delta_region_class(float *output, float *delta, int index, int class, int classes, tree *hier, float scale, int stride, float *avg_cat)
+void delta_region_class(float *output, float *delta, int index, int cur_class, int classes, tree *hier, float scale, int stride, float *avg_cat)
 {
     int i, n;
     if(hier){
         float pred = 1;
-        while(class >= 0){
-            pred *= output[index + stride*class];
-            int g = hier->group[class];
+        while(cur_class >= 0){
+            pred *= output[index + stride*cur_class];
+            int g = hier->group[cur_class];
             int offset = hier->group_offset[g];
             for(i = 0; i < hier->group_size[g]; ++i){
                 delta[index + stride*(offset + i)] = scale * (0 - output[index + stride*(offset + i)]);
             }
-            delta[index + stride*class] = scale * (1 - output[index + stride*class]);
+            delta[index + stride*cur_class] = scale * (1 - output[index + stride*cur_class]);
 
-            class = hier->parent[class];
+            cur_class = hier->parent[cur_class];
         }
         *avg_cat += pred;
     } else {
         for(n = 0; n < classes; ++n){
-            delta[index + stride*n] = scale * (((n == class)?1 : 0) - output[index + stride*n]);
-            if(n == class) *avg_cat += output[index + stride*n];
+            delta[index + stride*n] = scale * (((n == cur_class)?1 : 0) - output[index + stride*n]);
+            if(n == cur_class) *avg_cat += output[index + stride*n];
         }
     }
 }
@@ -195,7 +195,7 @@ void forward_region_layer(const layer l, network net)
             for(t = 0; t < 30; ++t){
                 box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
                 if(!truth.x) break;
-                int class = net.truth[t*(l.coords + 1) + b*l.truths + l.coords];
+                int cur_class = net.truth[t*(l.coords + 1) + b*l.truths + l.coords];
                 float maxp = 0;
                 int maxi = 0;
                 if(truth.x > 100000 && truth.y > 100000){
@@ -204,7 +204,7 @@ void forward_region_layer(const layer l, network net)
                         int obj_index = entry_index(l, b, n, l.coords);
                         float scale =  l.output[obj_index];
                         l.delta[obj_index] = l.noobject_scale * (0 - l.output[obj_index]);
-                        float p = scale*get_hierarchy_probability(l.output + class_index, l.softmax_tree, class, l.w*l.h);
+                        float p = scale*get_hierarchy_probability(l.output + class_index, l.softmax_tree, cur_class, l.w*l.h);
                         if(p > maxp){
                             maxp = p;
                             maxi = n;
@@ -212,7 +212,7 @@ void forward_region_layer(const layer l, network net)
                     }
                     int class_index = entry_index(l, b, maxi, l.coords + 1);
                     int obj_index = entry_index(l, b, maxi, l.coords);
-                    delta_region_class(l.output, l.delta, class_index, class, l.classes, l.softmax_tree, l.class_scale, l.w*l.h, &avg_cat);
+                    delta_region_class(l.output, l.delta, class_index, cur_class, l.classes, l.softmax_tree, l.class_scale, l.w*l.h, &avg_cat);
                     if(l.output[obj_index] < .3) l.delta[obj_index] = l.object_scale * (.3 - l.output[obj_index]);
                     else  l.delta[obj_index] = 0;
                     l.delta[obj_index] = 0;
@@ -307,10 +307,10 @@ void forward_region_layer(const layer l, network net)
                 l.delta[obj_index] = l.object_scale * (0 - l.output[obj_index]);
             }
 
-            int class = net.truth[t*(l.coords + 1) + b*l.truths + l.coords];
-            if (l.map) class = l.map[class];
+            int cur_class = net.truth[t*(l.coords + 1) + b*l.truths + l.coords];
+            if (l.map) cur_class = l.map[cur_class];
             int class_index = entry_index(l, b, best_n*l.w*l.h + j*l.w + i, l.coords + 1);
-            delta_region_class(l.output, l.delta, class_index, class, l.classes, l.softmax_tree, l.class_scale, l.w*l.h, &avg_cat);
+            delta_region_class(l.output, l.delta, class_index, cur_class, l.classes, l.softmax_tree, l.class_scale, l.w*l.h, &avg_cat);
             ++count;
             ++class_count;
         }

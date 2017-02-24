@@ -30,7 +30,7 @@ void gemm_bin(int M, int N, int K, float ALPHA,
 float *random_matrix(int rows, int cols)
 {
     int i;
-    float *m = calloc(rows*cols, sizeof(float));
+    float *m = (float *) calloc(rows*cols, sizeof(float));
     for(i = 0; i < rows*cols; ++i){
         m[i] = (float)rand()/RAND_MAX;
     }

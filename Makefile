@@ -18,7 +18,7 @@ ALIB=libdarknet.a
 EXEC=yolo_standalone
 OBJDIR=./obj/
 
-CC=gcc
+CC=g++
 NVCC=nvcc 
 AR=ar
 ARFLAGS=rcs
