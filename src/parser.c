@@ -754,7 +754,7 @@ network parse_network_cfg(char *filename)
         if(gpu_index >= 0){
             net.workspace = cuda_make_array(0, (workspace_size-1)/sizeof(float)+1);
         }else {
-            net.workspace = calloc(1, workspace_size);
+            net.workspace = (float *) calloc(1, workspace_size);
         }
 #else
         net.workspace = (float *) calloc(1, workspace_size);

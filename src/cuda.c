@@ -56,6 +56,7 @@ dim3 cuda_gridsize(size_t n){
         x = ceil(sqrt(k));
         y = (n-1)/(x*BLOCK) + 1;
     }
+    // dim3 d(x, y, 1);
     dim3 d = {x, y, 1};
     //printf("%ld %ld %ld %ld\n", n, x, y, x*y*BLOCK);
     return d;
@@ -119,7 +120,7 @@ void cuda_random(float *x_gpu, size_t n)
 
 float cuda_compare(float *x_gpu, float *x, size_t n, char *s)
 {
-    float *tmp = calloc(n, sizeof(float));
+    float *tmp = (float *) calloc(n, sizeof(float));
     cuda_pull_array(x_gpu, tmp, n);
     //int i;
     //for(i = 0; i < n; ++i) printf("%f %f\n", tmp[i], x[i]);
