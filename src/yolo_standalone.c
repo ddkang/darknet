@@ -59,7 +59,7 @@ static int YOLO_init(YOLO *self, char *datacfg, char *cfgfile, char *weightfile,
   self->names = get_labels(name_list);
 
   self->fout = fopen(csv_file, "wb");
-  fprintf(self->fout, "frame,labels\n");
+  fprintf(self->fout, "frame,object_name,confidence,xmin,ymin,xmax,ymax\n");
 
   // setup yolo network and load weights
   self->nms = 0.4;
@@ -107,7 +107,6 @@ static int YOLO_label_frame(YOLO *self, image im, int frame_num) {
   }
   if (self->nms > 0) do_nms(self->boxes, self->probs, l.w*l.h*l.n, l.classes, self->nms);
 
-  fprintf(self->fout, "%d,\"[", frame_num);
   for (j = 0; j < l.w * l.h * l.n; j++) {
     for (k = 0; k < l.classes; k++) {
       if (self->probs[j][k] > self->thresh) {
@@ -118,16 +117,13 @@ static int YOLO_label_frame(YOLO *self, image im, int frame_num) {
         float confidence = self->probs[j][k];
         char *object_name = self->names[k];
 
-        if (printed) fprintf(self->fout, ", ");
-        fprintf(self->fout, "{'confidence': %f, 'object_name': '%s', ",
-            confidence, object_name);
-        fprintf(self->fout, "'xmin': %f, 'ymin': %f, 'xmax': %f, 'ymax': %f}",
+        // frame,object_name,confidence,xmin,ymin,xmax,ymax
+        fprintf(self->fout, "%d,%s,%f,%f,%f,%f,%f\n",
+            frame_num, object_name, confidence,
             xmin, ymin, xmax, ymax);
-        printed = true;
       }
     }
   }
-  fprintf(self->fout, "]\"\n");
 
   free_image(sized);
 
@@ -135,7 +131,6 @@ static int YOLO_label_frame(YOLO *self, image im, int frame_num) {
 }
 
 int main(int argc, char **argv) {
-  int i;
   // FIXME
   char data_cfg[] = "cfg/coco.data";
   char cfg_file[] = "cfg/yolo.cfg";
@@ -145,12 +140,13 @@ int main(int argc, char **argv) {
 
   // Parse command line arguments.
   // Not a fan of positional arguments, but oh well
-  if (argc != 3) {
-    fprintf(stderr, "Usage: %s <video file> <output csv>\n", argv[0]);
+  if (argc != 4) {
+    fprintf(stderr, "Usage: %s <video file> <output csv> <start_frame>\n", argv[0]);
     exit(0);
   }
   video_file = argv[1];
   csv_file = argv[2];
+  const int start_frame = atoi(argv[3]);
 
   // Open video stream
   CvCapture *cap = cvCaptureFromFile(video_file);
@@ -164,8 +160,8 @@ int main(int argc, char **argv) {
   YOLO_init(yolo, data_cfg, cfg_file, weight_file, labels_dir, csv_file);
 
   // Label images
-  i = 0;
-  while(++i >= 0) {
+  cvSetCaptureProperty(cap, CV_CAP_PROP_POS_FRAMES, start_frame);
+  for (int i = start_frame; i < start_frame + 300000; i++) {
     if (i % 500 == 0)
       fprintf(stderr, "frame %d\n", i);
     image im = get_image_from_stream(cap);
