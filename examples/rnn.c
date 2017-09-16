@@ -284,7 +284,7 @@ void test_tactic_rnn_multi(char *cfgfile, char *weightfile, int num, float temp,
     int i, j;
     for(i = 0; i < net.n; ++i) net.layers[i].temperature = temp;
     int c = 0;
-    float *input = calloc(inputs, sizeof(float));
+    float *input = (float *) calloc(inputs, sizeof(float));
     float *out = 0;
 
     while(1){

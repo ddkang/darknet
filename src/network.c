@@ -60,7 +60,7 @@ network load_network(char *cfg, char *weights, int clear)
 
 network *load_network_p(char *cfg, char *weights, int clear)
 {
-    network *net = calloc(1, sizeof(network));
+    network *net = (network *) calloc(1, sizeof(network));
     *net = load_network(cfg, weights, clear);
     return net;
 }
@@ -403,8 +403,8 @@ int resize_network(network *net, int w, int h)
     net->output = out.output;
     free(net->input);
     free(net->truth);
-    net->input = calloc(net->inputs*net->batch, sizeof(float));
-    net->truth = calloc(net->truths*net->batch, sizeof(float));
+    net->input = (float *) calloc(net->inputs*net->batch, sizeof(float));
+    net->truth = (float *) calloc(net->truths*net->batch, sizeof(float));
 #ifdef GPU
     if(gpu_index >= 0){
         cuda_free(net->input_gpu);
@@ -503,7 +503,7 @@ int num_boxes(network *net)
 box *make_boxes(network *net)
 {
     layer l = net->layers[net->n-1];
-    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+    box *boxes = (box *) calloc(l.w*l.h*l.n, sizeof(box));
     return boxes;
 }
 
@@ -511,8 +511,8 @@ float **make_probs(network *net)
 {
     int j;
     layer l = net->layers[net->n-1];
-    float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
-    for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(l.classes + 1, sizeof(float *));
+    float **probs = (float **) calloc(l.w*l.h*l.n, sizeof(float *));
+    for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *) calloc(l.classes + 1, sizeof(float *));
     return probs;
 }
 

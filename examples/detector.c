@@ -273,7 +273,7 @@ void validate_detector_flip(char *datacfg, char *cfgfile, char *weightfile, char
         classes = 200;
     } else {
         if(!outfile) outfile = "comp4_det_test_";
-        fps = calloc(classes, sizeof(FILE *));
+        fps = (FILE **) calloc(classes, sizeof(FILE *));
         for(j = 0; j < classes; ++j){
             snprintf(buff, 1024, "%s/%s%s.txt", prefix, outfile, names[j]);
             fps[j] = fopen(buff, "w");
@@ -281,9 +281,9 @@ void validate_detector_flip(char *datacfg, char *cfgfile, char *weightfile, char
     }
 
 
-    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
-    float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
-    for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(classes+1, sizeof(float *));
+    box *boxes = (box *) calloc(l.w*l.h*l.n, sizeof(box));
+    float **probs = (float **) calloc(l.w*l.h*l.n, sizeof(float *));
+    for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *) calloc(classes+1, sizeof(float *));
 
     int m = plist->size;
     int i=0;
@@ -293,11 +293,11 @@ void validate_detector_flip(char *datacfg, char *cfgfile, char *weightfile, char
     float nms = .45;
 
     int nthreads = 4;
-    image *val = calloc(nthreads, sizeof(image));
-    image *val_resized = calloc(nthreads, sizeof(image));
-    image *buf = calloc(nthreads, sizeof(image));
-    image *buf_resized = calloc(nthreads, sizeof(image));
-    pthread_t *thr = calloc(nthreads, sizeof(pthread_t));
+    image *val = (image *) calloc(nthreads, sizeof(image));
+    image *val_resized = (image *) calloc(nthreads, sizeof(image));
+    image *buf = (image *) calloc(nthreads, sizeof(image));
+    image *buf_resized = (image *) calloc(nthreads, sizeof(image));
+    pthread_t *thr = (pthread_t *) calloc(nthreads, sizeof(pthread_t));
 
     image input = make_image(net.w, net.h, net.c*2);
 
@@ -612,7 +612,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *) calloc(l.classes + 1, sizeof(float *));
         float **masks = 0;
         if (l.coords > 4){
-            masks = (float *) calloc(l.w*l.h*l.n, sizeof(float*));
+            masks = (float **) calloc(l.w*l.h*l.n, sizeof(float**));
             for(j = 0; j < l.w*l.h*l.n; ++j) masks[j] = (float *) calloc(l.coords-4, sizeof(float *));
         }
 

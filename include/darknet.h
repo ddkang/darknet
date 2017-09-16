@@ -20,7 +20,7 @@ extern int gpu_index;
     #endif
 #endif
 
-#ifndef __cplusplus
+// #ifndef __cplusplus
     #ifdef OPENCV
     #include "opencv2/highgui/highgui_c.h"
     #include "opencv2/imgproc/imgproc_c.h"
@@ -29,7 +29,7 @@ extern int gpu_index;
     #include "opencv2/videoio/videoio_c.h"
     #endif
     #endif
-#endif
+// #endif
 
 typedef struct{
     int classes;
@@ -586,10 +586,10 @@ void normalize_cpu(float *x, float *mean, float *variance, int batch, int filter
 
 int best_3d_shift_r(image a, image b, int min, int max);
 #ifdef GPU
-void axpy_gpu(int N, float ALPHA, float * X, int INCX, float * Y, int INCY);
-void fill_gpu(int N, float ALPHA, float * X, int INCX);
-void scal_gpu(int N, float ALPHA, float * X, int INCX);
-void copy_gpu(int N, float * X, int INCX, float * Y, int INCY);
+extern "C" void axpy_gpu(int N, float ALPHA, float * X, int INCX, float * Y, int INCY);
+extern "C" void fill_gpu(int N, float ALPHA, float * X, int INCX);
+extern "C" void scal_gpu(int N, float ALPHA, float * X, int INCX);
+extern "C" void copy_gpu(int N, float * X, int INCX, float * Y, int INCY);
 
 void cuda_set_device(int n);
 void cuda_free(float *x_gpu);
@@ -712,11 +712,11 @@ void do_nms_obj(box *boxes, float **probs, int total, int classes, float thresh)
 
 matrix make_matrix(int rows, int cols);
 
-#ifndef __cplusplus
+// #ifndef __cplusplus
 #ifdef OPENCV
 image get_image_from_stream(CvCapture *cap);
 #endif
-#endif
+// #endif
 void free_image(image m);
 float train_network(network net, data d);
 pthread_t load_data_in_thread(load_args args);

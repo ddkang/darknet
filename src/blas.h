@@ -15,7 +15,7 @@ void deinter_cpu(int NX, float *X, int NY, float *Y, int B, float *OUT);
 void mult_add_into_cpu(int N, float *X, float *Y, float *Z);
 
 void const_cpu(int N, float ALPHA, float *X, int INCX);
-void constrain_gpu(int N, float ALPHA, float * X, int INCX);
+extern "C" void constrain_gpu(int N, float ALPHA, float * X, int INCX);
 void pow_cpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY);
 void mul_cpu(int N, float *X, int INCX, float *Y, int INCY);
 
@@ -47,16 +47,16 @@ void softmax_cpu(float *input, int n, int batch, int batch_offset, int groups, i
 #include "tree.h"
 
 void axpy_gpu(int N, float ALPHA, float * X, int INCX, float * Y, int INCY);
-void axpy_gpu_offset(int N, float ALPHA, float * X, int OFFX, int INCX, float * Y, int OFFY, int INCY);
+extern "C" void axpy_gpu_offset(int N, float ALPHA, float * X, int OFFX, int INCX, float * Y, int OFFY, int INCY);
 void copy_gpu(int N, float * X, int INCX, float * Y, int INCY);
-void copy_gpu_offset(int N, float * X, int OFFX, int INCX, float * Y, int OFFY, int INCY);
-void add_gpu(int N, float ALPHA, float * X, int INCX);
-void supp_gpu(int N, float ALPHA, float * X, int INCX);
-void mask_gpu(int N, float * X, float mask_num, float * mask);
-void scale_mask_gpu(int N, float * X, float mask_num, float * mask, float scale);
-void const_gpu(int N, float ALPHA, float *X, int INCX);
-void pow_gpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY);
-void mul_gpu(int N, float *X, int INCX, float *Y, int INCY);
+extern "C" void copy_gpu_offset(int N, float * X, int OFFX, int INCX, float * Y, int OFFY, int INCY);
+extern "C" void add_gpu(int N, float ALPHA, float * X, int INCX);
+extern "C" void supp_gpu(int N, float ALPHA, float * X, int INCX);
+extern "C" void mask_gpu(int N, float * X, float mask_num, float * mask);
+extern "C" void scale_mask_gpu(int N, float * X, float mask_num, float * mask, float scale);
+extern "C" void const_gpu(int N, float ALPHA, float *X, int INCX);
+extern "C" void pow_gpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY);
+extern "C" void mul_gpu(int N, float *X, int INCX, float *Y, int INCY);
 
 void mean_gpu(float *x, int batch, int filters, int spatial, float *mean);
 void variance_gpu(float *x, float *mean, int batch, int filters, int spatial, float *variance);
@@ -78,21 +78,21 @@ void backward_bias_gpu(float *bias_updates, float *delta, int batch, int n, int 
 
 void smooth_l1_gpu(int n, float *pred, float *truth, float *delta, float *error);
 void l2_gpu(int n, float *pred, float *truth, float *delta, float *error);
-void l1_gpu(int n, float *pred, float *truth, float *delta, float *error);
+extern "C" void l1_gpu(int n, float *pred, float *truth, float *delta, float *error);
 void weighted_delta_gpu(float *a, float *b, float *s, float *da, float *db, float *ds, int num, float *dc);
-void weighted_sum_gpu(float *a, float *b, float *s, int num, float *c);
+extern "C" void weighted_sum_gpu(float *a, float *b, float *s, int num, float *c);
 void mult_add_into_gpu(int num, float *a, float *b, float *c);
-void inter_gpu(int NX, float *X, int NY, float *Y, int B, float *OUT);
-void deinter_gpu(int NX, float *X, int NY, float *Y, int B, float *OUT);
+extern "C" void inter_gpu(int NX, float *X, int NY, float *Y, int B, float *OUT);
+extern "C" void deinter_gpu(int NX, float *X, int NY, float *Y, int B, float *OUT);
 
-void reorg_gpu(float *x, int w, int h, int c, int batch, int stride, int forward, float *out);
+extern "C" void reorg_gpu(float *x, int w, int h, int c, int batch, int stride, int forward, float *out);
 
-void softmax_gpu(float *input, int n, int batch, int batch_offset, int groups, int group_offset, int stride, float temp, float *output);
-void adam_update_gpu(float *w, float *d, float *m, float *v, float B1, float B2, float eps, float decay, float rate, int n, int batch, int t);
+extern "C" void softmax_gpu(float *input, int n, int batch, int batch_offset, int groups, int group_offset, int stride, float temp, float *output);
+extern "C" void adam_update_gpu(float *w, float *d, float *m, float *v, float B1, float B2, float eps, float decay, float rate, int n, int batch, int t);
 void adam_gpu(int n, float *x, float *m, float *v, float B1, float B2, float rate, float eps, int t);
 
-void flatten_gpu(float *x, int spatial, int layers, int batch, int forward, float *out);
-void softmax_tree(float *input, int spatial, int batch, int stride, float temp, float *output, tree hier);
+extern "C" void flatten_gpu(float *x, int spatial, int layers, int batch, int forward, float *out);
+extern "C" void softmax_tree(float *input, int spatial, int batch, int stride, float temp, float *output, tree hier);
 
 #endif
 #endif

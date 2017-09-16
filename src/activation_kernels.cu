@@ -156,7 +156,7 @@ extern "C" void activate_array_gpu(float *x, int n, ACTIVATION a)
     check_error(cudaPeekAtLastError());
 }
 
-void gradient_array_ongpu(float *x, int n, ACTIVATION a, float *delta)
+extern "C" void gradient_array_gpu(float *x, int n, ACTIVATION a, float *delta)
 {
     gradient_array_kernel<<<cuda_gridsize(n), BLOCK>>>(x, n, a, delta);
     check_error(cudaPeekAtLastError());

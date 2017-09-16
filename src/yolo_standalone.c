@@ -100,7 +100,8 @@ static int YOLO_label_frame(YOLO *self, image im, int frame_num) {
   if (l.type == DETECTION) {
     get_detection_boxes(l, 1, 1, self->thresh, self->probs, self->boxes, 0);
   } else if (l.type == REGION) {
-    get_region_boxes(l, 1, 1, self->thresh, self->probs, self->boxes, 0, 0, self->thresh);
+		int *map = 0;
+    get_region_boxes(l, im.w, im.h, self->net.w, self->net.h, self->thresh, self->probs, self->boxes, 0, 0, map, self->thresh, 0);
   } else {
     fprintf(stderr, "Last layer must be detections.\n");
     exit(1);

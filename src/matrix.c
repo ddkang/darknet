@@ -79,10 +79,10 @@ matrix copy_matrix(matrix m)
     matrix c = {0};
     c.rows = m.rows;
     c.cols = m.cols;
-    c.vals = calloc(c.rows, sizeof(float *));
+    c.vals = (float **) calloc(c.rows, sizeof(float *));
     int i;
     for(i = 0; i < c.rows; ++i){
-        c.vals[i] = calloc(c.cols, sizeof(float));
+        c.vals[i] = (float *) calloc(c.cols, sizeof(float));
         copy_cpu(c.cols, m.vals[i], 1, c.vals[i], 1);
     }
     return c;

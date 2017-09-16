@@ -131,7 +131,7 @@ void *detect_loop(void *ptr)
 void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const char *filename, char **names, int classes, int delay, char *prefix, int avg_frames, float hier, int w, int h, int frames, int fullscreen)
 {
     demo_frame = avg_frames;
-    predictions = calloc(demo_frame, sizeof(float*));
+    predictions = (float **) calloc(demo_frame, sizeof(float*));
     image **alphabet = load_alphabet();
     demo_names = names;
     demo_alphabet = alphabet;
@@ -222,7 +222,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const ch
 void demo_compare(char *cfg1, char *weight1, char *cfg2, char *weight2, float thresh, int cam_index, const char *filename, char **names, int classes, int delay, char *prefix, int avg_frames, float hier, int w, int h, int frames, int fullscreen)
 {
     demo_frame = avg_frames;
-    predictions = calloc(demo_frame, sizeof(float*));
+    predictions = (float **) calloc(demo_frame, sizeof(float*));
     image **alphabet = load_alphabet();
     demo_names = names;
     demo_alphabet = alphabet;
