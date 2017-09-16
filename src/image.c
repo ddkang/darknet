@@ -11,7 +11,6 @@
 #include "stb_image_write.h"
 
 #include "darknet.h"
-#include "opencv2/highgui/highgui_c.h"
 
 int windows = 0;
 
