@@ -9,9 +9,10 @@ load(
 
 tf_kernel_library(
     name = "yolo",
-    copts = ["-DGPU", "-DCUDNN"],
-    srcs = glob(["src/*.c"]),
-    gpu_srcs = glob(["src/*.cc"]) + glob(["src/*.h"]),
+    # copts = ["-DGPU", "-DCUDNN"],
+    defines=["GPU", "CUDNN"],
+    # srcs = glob(["src/*.c"]),
+    gpu_srcs = glob(["src/*.cu"]) + glob(["src/*.cc"]) + glob(["src/*.h"]),
     hdrs = glob(["src/*.h"]),
     deps = [
         "//tensorflow/core:tensorflow"

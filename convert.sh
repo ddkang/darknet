@@ -17,4 +17,8 @@ for file in src/*.c ; do
   mv "$file" "src/$(basename "$file" .c).cu.cc"
 done
 
+for file in src/*.cu ; do
+  mv "$file" "src/$(basename "$file" .cu).cu.cc"
+done
+
 mv "include/darknet.h" "src/"
